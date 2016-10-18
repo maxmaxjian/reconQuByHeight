@@ -23,17 +23,21 @@ public:
     
     vector<pair<int,int>> start = dict[0];
     std::sort(start.begin(), start.end(), comp);
+    // std::for_each(start.begin(), start.end(), [](const pair<int,int> & pr){
+    // 	std::cout << "[" << pr.first << "," << pr.second << "] ";
+    //   });
+    // std::cout << std::endl;
     dict.erase(0);
 
     vector<vector<pair<int,int>>> results;
     auto paths = getPath(dict, start);
     for (auto path : paths) {
+      std::for_each(path.begin(), path.end(), [](const pair<int,int> & pr){
+	  std::cout << "[" << pr.first << "," << pr.second << "] ";
+	});
+      std::cout << std::endl;
       if (path.size() == people.size()) {
 	results.push_back(path);
-	std::for_each(path.begin(), path.end(), [](const pair<int,int> & pr){
-	    std::cout << "[" << pr.first << "," << pr.second << "] ";
-	  });
-	std::cout << std::endl;
       }
     }
 
@@ -47,23 +51,26 @@ private:
       result.push_back(curr);
     else {
       auto it = a_map.begin()->second.begin();
+      // std::cout << "curr = [" << it->first << "," << it->second << "]" << std::endl;
+      auto pr = *it;
       if (a_map.begin()->second.size() == 1)
 	a_map.erase(a_map.begin());
       else
 	a_map.begin()->second.erase(it);
       
-      for (size_t i = it->second; i < curr.size(); ++i) {
+      for (size_t i = it->second; i <= curr.size(); ++i) {
+	auto map_cpy = a_map;
 	int count = 0;
 	size_t idx = 0;
 	while (idx < i) {
-	  if (curr[idx].first >= it->first)
+	  if (curr[idx].first >= pr.first)
 	    count++;
 	  idx++;
 	}
-	if (count == it->second) {
+	if (count == pr.second) {
 	  auto cpy = curr;
-	  cpy.insert(cpy.begin()+i, *it);
-	  auto temp = getPath(a_map, cpy);
+	  cpy.insert(cpy.begin()+i, pr);
+	  auto temp = getPath(map_cpy, cpy);
 	  for (auto tmp : temp)
 	    result.push_back(tmp);
 	}
